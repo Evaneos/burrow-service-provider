@@ -1,0 +1,33 @@
+{
+    "name": "evaneos/burrow-service-provider",
+    "description": "Bundle evaneos/burrow, an AMQP library in PHP, to be easily used with Silex.",
+    "type": "silex-service-provider",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Quentin",
+            "email": "quentin.pautrat@gmail.com"
+        }
+    ],
+    "require": {
+        "silex/silex": "^2.0",
+        "beberlei/assert": "^2.7",
+        "evaneos/burrow": "^4.0"
+    },
+    "require-dev": {
+        "knplabs/console-service-provider": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Evaneos\\Burrow\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Evaneos\\Burrow\\": "tests"
+        }
+    },
+    "suggest": {
+        "knplabs/console-service-provider": "Automaticaly add commands to consume messages."
+    },
+}

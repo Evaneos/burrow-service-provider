@@ -1,0 +1,33 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+$app = new Silex\Application();
+$app->register(new Evaneos\Burrow\BurrowServiceProvider(), [
+    'evaneos_burrow.options.drivers' => [
+        'default' => [
+            'host' => 'localhost',
+            'port' => 5672,
+            'user' => 'rabbitmq',
+            'pwd' => 'rabbitmq'
+        ]
+    ],
+    'evaneos_burrow.options.workers' => [
+        'some_event' => [
+            'driver' => 'default',
+            'consumer' => 'some_consumer',
+            'queue' => 'some_event'
+        ]
+    ],
+]);
+$app->register(new Knp\Provider\ConsoleServiceProvider(), array(
+    'console.name'              => 'MyApplication',
+    'console.version'           => '1.0.0',
+    'console.project_directory' => __DIR__.'/..'
+));
+$app['some_consumer'] = function () {
+    return new Tests\Evaneos\Burrow\SomeConsumer();
+};
+$application = $app['console'];
+$application->run();
