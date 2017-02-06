@@ -29,5 +29,5 @@
     },
     "suggest": {
         "knplabs/console-service-provider": "Automaticaly add commands to consume messages."
-    },
+    }
 }
