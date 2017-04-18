@@ -14,6 +14,11 @@ use Burrow\Handler\HandlerBuilder;
 use Burrow\QueueConsumer;
 use Burrow\Daemon\QueueHandlingDaemon;
 use Evaneos\Daemon\Worker;
+use Burrow\CLI\DeleteExchangeCommand;
+use Burrow\CLI\DeclareExchangeCommand;
+use Burrow\CLI\DeleteQueueCommand;
+use Burrow\CLI\DeclareQueueCommand;
+use Burrow\CLI\BindCommand;
 
 class BurrowServiceProvider implements ServiceProviderInterface, BootableProviderInterface
 {
@@ -73,6 +78,15 @@ class BurrowServiceProvider implements ServiceProviderInterface, BootableProvide
 
             return $workers;
         };
+
+        $container['evaneos_burrow.default_driver'] = function ($container) {
+            if (!isset($container['evaneos_burrow.options.default_driver'])) {
+                $keys = array_keys($container['evaneos_burrow.options.drivers']);
+                $container['evaneos_burrow.options.default_driver'] = reset($keys);
+            }
+
+            return $container['evaneos_burrow.drivers'][$container['evaneos_burrow.options.default_driver']];
+        };
     }
 
     public function boot(Application $app)
@@ -82,6 +96,13 @@ class BurrowServiceProvider implements ServiceProviderInterface, BootableProvide
                 foreach ($app['evaneos_burrow.options.workers'] as $name => $values) {
                     $event->getApplication()->add(new DaemonWorkerCommand($app['evaneos_burrow.workers'][$name], sprintf('evaneos_burrow:consume:%s', $name)));
                 }
+                $event->getApplication()->addCommands([
+                    (new DeleteExchangeCommand($app['evaneos_burrow.default_driver']))->setName('evaneos_burrow:command:delete_exchange'),
+                    (new DeclareExchangeCommand($app['evaneos_burrow.default_driver']))->setName('evaneos_burrow:command:declare_exchange'),
+                    (new DeleteQueueCommand($app['evaneos_burrow.default_driver']))->setName('evaneos_burrow:command:delete_queue'),
+                    (new DeclareQueueCommand($app['evaneos_burrow.default_driver']))->setName('evaneos_burrow:command:declare_queue'),
+                    (new BindCommand($app['evaneos_burrow.default_driver']))->setName('evaneos_burrow:command:bind'),
+                ]);
             });
         }
     }
